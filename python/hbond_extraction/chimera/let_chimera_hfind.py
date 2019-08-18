@@ -36,8 +36,6 @@ for xprm in ('xray/', 'EM/'):
 	for pdbfile in os.listdir(pdb_path + xprm):
 		pdb_list.append(pdbfile[0:4])
 
-print(pdb_list)
-
 # ----------------------------------------------------------
 # make a pdb file list
 # ----------------------------------------------------------
@@ -63,8 +61,7 @@ for xprm in ('xray_cif/', 'EM_cif/'):
 		if '.cif' not in ciffile or cif_filename[0:4] in done_list:
 			continue
 		if cif_filename[0:4] in pdb_list:
-			print("open " + pdb_path + xprm[:-5] + '/' + cif_filename[0:4] + '.pdb')
-			rc("open " + pdb_path + xprm[:-5] + cif_filename[0:4] + '.pdb')
+			rc("open " + pdb_path + xprm[:-5] + '/' + cif_filename[0:4] + '.pdb')
 			print(cif_filename + ' :READING PDB FILE INSTEAD !!!!')
 		else:
 			print(cif_filename + ' :READING CIF FILE !!!!')

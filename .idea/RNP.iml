@@ -11,6 +11,7 @@
       <excludeFolder url="file://$MODULE_DIR$/eleteme" />
       <excludeFolder url="file://$MODULE_DIR$/hbplus" />
       <excludeFolder url="file://$MODULE_DIR$/py27" />
+      <excludeFolder url="file://$MODULE_DIR$/python/hbond_extraction/chimera/deleteme" />
       <excludeFolder url="file://$MODULE_DIR$/related_papers" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
