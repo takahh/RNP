@@ -2,9 +2,15 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/check_contact" />
       <excludeFolder url="file://$MODULE_DIR$/check_contact/PDBfiles" />
+      <excludeFolder url="file://$MODULE_DIR$/check_contact/chimera_hb_out" />
+      <excludeFolder url="file://$MODULE_DIR$/check_contact/hbplus_out" />
+      <excludeFolder url="file://$MODULE_DIR$/check_contact/ファイルフォーマット研究" />
       <excludeFolder url="file://$MODULE_DIR$/downloads_PDB" />
       <excludeFolder url="file://$MODULE_DIR$/eleteme" />
+      <excludeFolder url="file://$MODULE_DIR$/hbplus" />
+      <excludeFolder url="file://$MODULE_DIR$/py27" />
       <excludeFolder url="file://$MODULE_DIR$/related_papers" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
