@@ -73,7 +73,15 @@ for xprm in ('xray_cif/', 'EM_cif/'):
 		# ----------------------------------------------------------
 		try:
 			rc("cryst #0 5 copies true") # create copies in 5A around model #0
-			rc("hbonds showDist true intraMol false intraRes false saveFile " + output_file)
+			rc("hbonds namingStyle simples showDist true intraMol false intraRes false saveFile " + output_file)
 			rc("close all")
 		except ValueError:
 			print('ValueError!!!!')
+		except TypeError:
+			print('TypeError!!!!')
+			rc("close all")
+			print(cif_filename + ' :READING CIF FILE !!!!')
+			rc("open " + ciffile)
+			rc("cryst #0 5 copies true") # create copies in 5A around model #0
+			rc("hbonds namingStyle simples showDist true intraMol false intraRes false saveFile " + output_file)
+			rc("close all")
