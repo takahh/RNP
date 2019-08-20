@@ -51,29 +51,32 @@ for xprm in xprm_list:
 				# read from csv and change it to dictionary type
 				line_dic = literal_eval(line)
 				pdbid = line_dic['chain'][0:4]
-				chain = line_dic['chain'][6:-1]
+				chain = line_dic['chain'][7:-1]
 				for key, value in line_dic.items():
 					if key == 'chain':
 						type = value[-1]
 						continue
 					model = key.split('.')[0]
+					# collect model information
 					if model not in model_dic.keys():
 						model_dic[model] = 1
 					else:
 						model_dic[model] += 1
 					# '#0.Ap': 176
+					# collect p informatin
 					if key[-1] == 'p':
 						model_chain = key[:-1] # e.g. '#0.A'
 						if model_chain not in p_chain_dic:
-							p_chain_dic[model] = value
+							p_chain_dic[model_chain] = value
 						else:
-							p_chain_dic[model] += value
+							p_chain_dic[model_chain] += value
+					# collect r
 					elif key[-1] == 'r':
 						model_chain = key[:-1] # e.g. '#0.A'
 						if model_chain not in r_chain_dic.keys():
-							r_chain_dic[model] = value
+							r_chain_dic[model_chain] = value
 						else:
-							r_chain_dic[model] += value
+							r_chain_dic[model_chain] += value
 				if len(p_chain_dic) > 0:
 					p_chains = len(p_chain_dic)
 					p_hbonds = sum(p_chain_dic.values())

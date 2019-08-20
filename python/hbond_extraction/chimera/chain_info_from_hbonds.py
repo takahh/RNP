@@ -45,8 +45,8 @@ def unique_chain_list(experiment):
 				type2 = "r"
 			else:
 				type2 = "p"
-			chain1 = f'{element[0]}{element[2].split(".")[1]}{type1}'
-			chain2 = f'{element[4]}{element[6].split(".")[1]}{type2}'
+			chain1 = f'{element[0]}.{element[2].split(".")[1]}{type1}'
+			chain2 = f'{element[4]}.{element[6].split(".")[1]}{type2}'
 			for chain in [chain1, chain2]:
 				if chain not in list_of_unique_chains and '#0' in chain:
 					list_of_unique_chains.append(chain)
@@ -87,14 +87,18 @@ for xprm in xprm_list:
 							type2 = "r"
 						else:
 							type2 = "p"
-						if f'{model1}{chain1}{type1}' == chain:
+						if f'{model1}.{chain1}{type1}' == chain:
 							touching_chain = f'{model2}.{chain2}{type2}'
+							if touching_chain == chain: # if contact is in the same chain
+								continue
 							if touching_chain not in touching_chain_dic.keys():
 								touching_chain_dic[touching_chain] = 1
 							else:
 								touching_chain_dic[touching_chain] += 1
-						elif f'{model2}{chain2}{type2}' == chain:
+						elif f'{model2}.{chain2}{type2}' == chain:
 							touching_chain = f'{model1}.{chain1}{type1}'
+							if touching_chain == chain: # if contact is in the same chain
+								continue
 							if touching_chain not in touching_chain_dic.keys():
 								touching_chain_dic[touching_chain] = 1
 							else:
