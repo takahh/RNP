@@ -38,5 +38,5 @@ for xprm in xprm_list:
 		with open(root_path_to + xprm + '/' + file, 'w') as fo:
 			with open(root_path_from + xprm + '_cif/' + file) as f:
 				for line in f.readlines():
-					if line[0:2] == '#0':
+					if line[0:2] == '#0' and 'HOH' not in line:
 						fo.writelines(line)

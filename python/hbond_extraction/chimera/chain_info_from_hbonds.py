@@ -30,16 +30,25 @@ def unique_chain_list(experiment):
 	# ----------------------------------------------------
 	# input row example
 	# 012345678901234567890123456789
+	# 0  1   2    3      4  5   6
 	# #0 ARG 28.B NE     #0 GLU 92.A OE1    no hydrogen  2.393  N/A
 
 	list_of_unique_chains = []
 	with open(root_path_from + experiment + "/" + file) as f:
 		for line in f.readlines():
 			element = line.split()
-			chain1 = f'{element[0]}{element[2].split(".")[1]}'
-			chain2 = f'{element[4]}{element[6].split(".")[1]}'
+			if len(element[1]) == 1:
+				type1 = "r"
+			else:
+				type1 = "p"
+			if len(element[5]) == 1:
+				type2 = "r"
+			else:
+				type2 = "p"
+			chain1 = f'{element[0]}{element[2].split(".")[1]}{type1}'
+			chain2 = f'{element[4]}{element[6].split(".")[1]}{type2}'
 			for chain in [chain1, chain2]:
-				if chain not in list_of_unique_chains:
+				if chain not in list_of_unique_chains and '#0' in chain:
 					list_of_unique_chains.append(chain)
 	return list_of_unique_chains
 
@@ -47,7 +56,6 @@ def unique_chain_list(experiment):
 # ----------------------------------------------------------
 # main
 # ----------------------------------------------------------
-
 # input row example
 # 012345678901234567890123456789
 # 0  1   2    3      4  5   6    7      8            9
@@ -60,8 +68,8 @@ for xprm in xprm_list:
 			if '.DS' in file:
 				continue
 			chain_list = unique_chain_list(xprm)
-			touching_chain_dic = {}
 			for chain in chain_list: # collect touching chains info per unique chain
+				touching_chain_dic = {}
 				touching_chain_dic['chain'] = file[0:4] + chain
 				with open(root_path_from + xprm + '/' + file) as f:
 					for line in f.readlines():
@@ -79,14 +87,14 @@ for xprm in xprm_list:
 							type2 = "r"
 						else:
 							type2 = "p"
-						if f'{model1}{chain1}' == chain:
-							touching_chain = f'{model2}{chain2}{type2}'
+						if f'{model1}{chain1}{type1}' == chain:
+							touching_chain = f'{model2}.{chain2}{type2}'
 							if touching_chain not in touching_chain_dic.keys():
 								touching_chain_dic[touching_chain] = 1
 							else:
 								touching_chain_dic[touching_chain] += 1
-						elif f'{model2}{chain2}' == chain:
-							touching_chain = f'{model1}{chain1}{type1}'
+						elif f'{model2}{chain2}{type2}' == chain:
+							touching_chain = f'{model1}.{chain1}{type1}'
 							if touching_chain not in touching_chain_dic.keys():
 								touching_chain_dic[touching_chain] = 1
 							else:
