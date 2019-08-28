@@ -7,11 +7,13 @@
       <excludeFolder url="file://$MODULE_DIR$/check_contact/chimera_hb_out" />
       <excludeFolder url="file://$MODULE_DIR$/check_contact/hbplus_out" />
       <excludeFolder url="file://$MODULE_DIR$/check_contact/ファイルフォーマット研究" />
+      <excludeFolder url="file://$MODULE_DIR$/deleteme" />
       <excludeFolder url="file://$MODULE_DIR$/downloads_PDB" />
       <excludeFolder url="file://$MODULE_DIR$/eleteme" />
       <excludeFolder url="file://$MODULE_DIR$/hbplus" />
       <excludeFolder url="file://$MODULE_DIR$/py27" />
       <excludeFolder url="file://$MODULE_DIR$/python/hbond_extraction/chimera/deleteme" />
+      <excludeFolder url="file://$MODULE_DIR$/python/hbond_extraction/hbplus" />
       <excludeFolder url="file://$MODULE_DIR$/related_papers" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>

@@ -15,10 +15,12 @@ import os
 # ----------------------------------------------------------
 # constants
 # ----------------------------------------------------------
-xprm_list = ['xray', 'EM']
+xprm_list = ['EM']
+# xprm_list = ['xray', 'EM']
 path = '/Users/tkimura/Desktop/RNP/check_contact/'
 root_path_from = path + 'hb_out_cleaned/'
 root_path_to = path + 'chain_summary/'
+file_counts = 0
 
 # ----------------------------------------------------------
 # functions
@@ -36,20 +38,24 @@ def unique_chain_list(experiment):
 	list_of_unique_chains = []
 	with open(root_path_from + experiment + "/" + file) as f:
 		for line in f.readlines():
-			element = line.split()
-			if len(element[1]) == 1:
-				type1 = "r"
-			else:
-				type1 = "p"
-			if len(element[5]) == 1:
-				type2 = "r"
-			else:
-				type2 = "p"
-			chain1 = f'{element[0]}.{element[2].split(".")[1]}{type1}'
-			chain2 = f'{element[4]}.{element[6].split(".")[1]}{type2}'
-			for chain in [chain1, chain2]:
-				if chain not in list_of_unique_chains and '#0' in chain:
-					list_of_unique_chains.append(chain)
+			try:
+				element = line.split()
+				if len(element[1]) == 1:
+					type1 = "r"
+				else:
+					type1 = "p"
+				if len(element[5]) == 1:
+					type2 = "r"
+				else:
+					type2 = "p"
+				chain1 = f'{element[0]}.{element[2].split(".")[1]}{type1}'
+				chain2 = f'{element[4]}.{element[6].split(".")[1]}{type2}'
+				for chain in [chain1, chain2]:
+					if chain not in list_of_unique_chains and '#0' in chain:
+						list_of_unique_chains.append(chain)
+			except IndexError:
+				print(file)
+				print(line)
 	return list_of_unique_chains
 
 
@@ -65,6 +71,7 @@ def unique_chain_list(experiment):
 for xprm in xprm_list:
 	with open(root_path_to + xprm + '/' + xprm + '_chain_summary.csv', 'w') as fo:
 		for file in os.listdir(root_path_from + xprm + '/'):
+			file_counts += 1
 			if '.DS' in file:
 				continue
 			chain_list = unique_chain_list(xprm)

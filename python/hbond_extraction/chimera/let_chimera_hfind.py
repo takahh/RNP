@@ -18,26 +18,29 @@ path = '/Users/tkimura/Desktop/RNP/'
 cif_path = path + 'downloads_PDB/'
 pdb_path = path + 'check_contact/PDBfiles/'
 hbout_path = path + 'check_contact/chimera_hb_out/'
-done_list,pdb_list = [], []
-file_list_dic = {}
+pdb_list_dic, file_list_dic, done_list_dic = {}, {}, {}
 skip_list = ['4uyj', '6bbo','6b0b','1xpu']
 
 # ----------------------------------------------------------
 # make a done-list
 # ----------------------------------------------------------
 for xprm in ('xray_cif/', 'EM_cif/'):
+	done_list = []
 	for ciffile in os.listdir(hbout_path + xprm):
 		done_list.append(ciffile[0:4])
+	done_list_dic[xprm[:-5]] = done_list
 
 # ----------------------------------------------------------
 # make a pdb file list
 # ----------------------------------------------------------
 for xprm in ('xray/', 'EM/'):
+	pdb_list = []
 	for pdbfile in os.listdir(pdb_path + xprm):
 		pdb_list.append(pdbfile[0:4])
+	pdb_list_dic[xprm[:-1]] = pdb_list
 
 # ----------------------------------------------------------
-# make a pdb file list
+# make a cif file list sorted by the file size
 # ----------------------------------------------------------
 def sorted_cif_list():
 	for exp in ('xray', 'EM'):
@@ -52,16 +55,19 @@ def sorted_cif_list():
 # main
 # ----------------------------------------------------------
 os.chdir(path)
-for xprm in ('xray_cif/', 'EM_cif/'):
+for xprm in (['EM_cif/']):
+# for xprm in (['xray_cif/']):
 	cif_list_dic = sorted_cif_list()
-	for ciffile in cif_list_dic[xprm[:-5]]:
+	xprm_s = xprm.replace('_cif/', '')
+	for ciffile in cif_list_dic[xprm_s]:
 		cif_filename = ciffile.split('/')[-1]
+		# print("open " + pdb_path + xprm_s + '/' + cif_filename[0:4] + '.pdb')
 		if cif_filename[0:4] in skip_list: # skip erroneous entry
 			continue
-		if '.cif' not in ciffile or cif_filename[0:4] in done_list:
+		if '.cif' not in ciffile or cif_filename[0:4] in done_list_dic[xprm_s]:
 			continue
-		if cif_filename[0:4] in pdb_list:
-			rc("open " + pdb_path + xprm[:-5] + '/' + cif_filename[0:4] + '.pdb')
+		if cif_filename[0:4] in pdb_list_dic[xprm[:-5]]:
+			rc("open " + pdb_path + xprm_s + '/' + cif_filename[0:4] + '.pdb')
 			print(cif_filename + ' :READING PDB FILE INSTEAD !!!!')
 		else:
 			print(cif_filename + ' :READING CIF FILE !!!!')
@@ -72,16 +78,19 @@ for xprm in ('xray_cif/', 'EM_cif/'):
 		# (later) choose bonds including #0
 		# ----------------------------------------------------------
 		try:
-			rc("cryst #0 5 copies true") # create copies in 5A around model #0
+			if 'xray' in xprm:
+				rc("cryst #0 5 copies true") # create copies in 5A around model #0
 			rc("hbonds namingStyle simples showDist true intraMol false intraRes false saveFile " + output_file)
 			rc("close all")
-		except ValueError:
-			print('ValueError!!!!')
+		except ValueError as e:
+			print('VALUEERROR!!!!!!!!!!!')
+			print(e)
 		except TypeError:
 			print('TypeError!!!!')
 			rc("close all")
 			print(cif_filename + ' :READING CIF FILE !!!!')
 			rc("open " + ciffile)
-			rc("cryst #0 5 copies true") # create copies in 5A around model #0
-			rc("hbonds namingStyle simples showDist true intraMol false intraRes false saveFile " + output_file)
+			if 'xray' in xprm:
+				rc("cryst #0 5 copies true") # create copies in 5A around model #0
+			rc("hbonds namingStyle simples showDist true intraMol false intraRes false batch true saveFile " + output_file)
 			rc("close all")

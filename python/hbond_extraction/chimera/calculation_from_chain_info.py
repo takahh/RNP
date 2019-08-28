@@ -90,6 +90,9 @@ for xprm in xprm_list:
 				else:
 					avg_r_hbonds = 0
 				models = len(model_dic)-1
-				model_dic.pop(model)
+				try:
+					model_dic.pop(model)
+				except KeyError:
+					pass
 				models_hbonds = sum(model_dic.values())
 				fo.writelines(f'{pdbid},{chain},{type},{r_chains},{r_hbonds},{avg_r_hbonds},{p_chains},{p_hbonds},{avg_p_hbonds},{models},{models_hbonds}\n')

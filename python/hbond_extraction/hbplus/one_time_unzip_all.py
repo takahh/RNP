@@ -24,5 +24,5 @@ for file in os.listdir(EM_path):
 	# if 'bundle' in file:
 		# print(path + file)
 		# os.remove(EM_path + file)
-	subprocess.call(['cd', '/Users/tkimura/Desktop/RNP/check_contact/hbplus_out/EM'])
+	subprocess.call(['cd', '/Users/tkimura/Desktop/RNP/deleteme/hbplus_out/EM'])
 	subprocess.call(['hbplus', EM_path + file])
