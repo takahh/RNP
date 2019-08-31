@@ -1,5 +1,5 @@
 # ----------------------------------------------------------
-# this code is for summarizing hbond raw data
+# this code is for summarizing hbond raw hbond data
 # to make a data file for info per chain
 # output example
 # {'chain': '4wta#0P', '#0Ap': 230, '#0Tp': 1, '#5Ap': 1, '#3Ap': 9, '#0Pr': 25, '#0Pp': 7}

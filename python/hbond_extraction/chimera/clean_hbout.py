@@ -43,4 +43,7 @@ for xprm in xprm_list:
 							fo.writelines(line)
 					else:
 						if 'HOH' not in line:
-							fo.writelines(line)
+							#0 7MG 1.D N1 #0 G 1.D N7
+							#0 7MG 1.D N2 #0 G 1.D N7
+							if line.split()[2] != line.split()[6]:
+								fo.writelines(line)
