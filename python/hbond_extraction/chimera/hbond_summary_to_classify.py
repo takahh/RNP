@@ -90,6 +90,10 @@ with open(hbond_summary, 'a') as fo:
 						rinfo_dic = chaininfo_dic[exp][f'{pdbid}#0.{rchain}r']
 						for key in rinfo_dic:
 							if key[-1] == 'p':
+								##### put code here to check if the p is the opponent of main hbond #####
+								refchain = key.split('.')[1][:-1]
+								if refchain == pchain:
+									continue
 								rp.append(rinfo_dic[key])
 							elif key[-1] == 'r':
 								rr.append(rinfo_dic[key])
@@ -104,6 +108,10 @@ with open(hbond_summary, 'a') as fo:
 							if key[-1] == 'p':
 								pp.append(pinfo_dic[key])
 							elif key[-1] == 'r':
+								##### put code here to check if the p is the opponent of main hbond #####
+								refchain = key.split('.')[1][:-1]
+								if refchain == rchain:
+									continue
 								pr.append(pinfo_dic[key])
 					except KeyError:
 						# print(f'{exp}_KEYERROR!!!!')
