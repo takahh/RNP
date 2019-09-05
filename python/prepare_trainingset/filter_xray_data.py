@@ -137,5 +137,5 @@ pdb_list = ['1A34', '1AV6', '1B23', '1B2M', '1B7F', '1C0A', '1C9S', '1DDL', '1DF
 with open(output_file, 'w') as fo:
 	with open(input_file) as f:
 		for lines in f.readlines():
-			if lines[0:4].upper() in pdb_list:
+			if lines[0:4] in pdb_list:
 				fo.writelines(lines)

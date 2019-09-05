@@ -15,8 +15,8 @@ import os
 # ----------------------------------------------------------
 # constants
 # ----------------------------------------------------------
-xprm_list = ['EM']
-# xprm_list = ['xray', 'EM']
+# xprm_list = ['EM']
+xprm_list = ['xray']
 path = '/Users/tkimura/Desktop/RNP/check_contact/'
 root_path_from = path + 'hb_out_cleaned/'
 root_path_to = path + 'chain_summary/'

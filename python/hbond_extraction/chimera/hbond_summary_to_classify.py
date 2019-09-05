@@ -36,6 +36,8 @@ contactfile = '_chain_summary.csv'
 exp_list = ['xray', 'EM']
 chaininfo_dic, out_dic = {}, {}
 hbond_summary = '/Users/tkimura/Desktop/RNP/check_contact/hbond_summary.txt'
+aminos = ['ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLU', 'GLN', 'GLY', 'HIS', 'ILE', 'LEU', 'LYS', 'MET', 'PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL']
+bases = ['A', 'C', 'G', 'U']
 
 # ----------------------------------------------------------
 # preparation
@@ -84,39 +86,41 @@ with open(hbond_summary, 'a') as fo:
 					else:
 						continue # skip when pp or rr interactions
 
+					# # skip if the residue or the base is uncanonical
+					# if presi not in aminos or rresi not in bases:
+					# 	continue
+
 					# '6ifr#0.Bp': {'chain': '6ifr#0.Bp', '#0.Ap': 6, '#0.Ep': 11, '#0.Nr': 17, '#0.Jr': 5}
-					# get chain info on the RNA side
 					try:
+						# get chain info on the RNA side
 						rinfo_dic = chaininfo_dic[exp][f'{pdbid}#0.{rchain}r']
 						for key in rinfo_dic:
 							if key[-1] == 'p':
-								##### put code here to check if the p is the opponent of main hbond #####
-								refchain = key.split('.')[1][:-1]
-								if refchain == pchain:
+								# ignore the hbonds of the row itself
+								refchain = key.split('#')[1][:-1] # e.g.  0.B <-- model#.chainID
+								if refchain == f'{element[0][1:]}.{pchain}':
 									continue
-								rp.append(rinfo_dic[key])
+								else:
+									rp.append(rinfo_dic[key])
 							elif key[-1] == 'r':
 								rr.append(rinfo_dic[key])
-					except KeyError:
-						# print(f'{exp}_KEYERROR!!!!')
-						# print(f'{pdbid}#0.{rchain}r')
-						pass
-					# get chain info on the protein side
-					try:
-						pinfo_dic = chaininfo_dic[exp][f'{pdbid}#0.{rchain}p']
+
+						# get chain info on the protein side
+						pinfo_dic = chaininfo_dic[exp][f'{pdbid}#0.{pchain}p']
 						for key in pinfo_dic:
 							if key[-1] == 'p':
 								pp.append(pinfo_dic[key])
 							elif key[-1] == 'r':
-								##### put code here to check if the p is the opponent of main hbond #####
-								refchain = key.split('.')[1][:-1]
-								if refchain == rchain:
+								# ignore the hbonds of the row itself
+								refchain = key.split('#')[1][:-1] # e.g.  0.B <-- model#.chainID
+								if refchain == f'{element[0][1:]}.{rchain}':
 									continue
-								pr.append(pinfo_dic[key])
+								else:
+									pr.append(pinfo_dic[key])
+						all_chains = len(pp) + len(rp) + len(pr) + len(rr)
+						all_chains_3 = len([num for num in pp if num >= 3]) + len([num for num in pr if num >= 3]) + len([num for num in rp if num >= 3]) + len([num for num in rr if num >= 3])
+						fo.writelines(f'{pdbid}	{exp}	{presi}	{pchain}	{rresi}	{rchain}	{sorted(pp)}	{sorted(pr)}	{sorted(rp)}	{sorted(rr)}	{all_chains}	{all_chains_3}\n')
 					except KeyError:
 						# print(f'{exp}_KEYERROR!!!!')
 						# print(f'{pdbid}#0.{rchain}p')
 						pass
-					all_chains = len(pp) + len(rp) + len(pr) + len(rr)
-					all_chains_3 = len([num for num in pp if num >= 3]) + len([num for num in pr if num >= 3]) + len([num for num in rp if num >= 3]) + len([num for num in rr if num >= 3])
-					fo.writelines(f'{pdbid}	{exp}	{presi}	{pchain}	{rresi}	{rchain}	{sorted(pp)}	{sorted(pr)}	{sorted(rp)}	{sorted(rr)}	{all_chains}	{all_chains_3}\n')
