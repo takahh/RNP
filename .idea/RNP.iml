@@ -15,7 +15,10 @@
       <excludeFolder url="file://$MODULE_DIR$/python/hbond_extraction/chimera/deleteme" />
       <excludeFolder url="file://$MODULE_DIR$/python/hbond_extraction/hbplus" />
       <excludeFolder url="file://$MODULE_DIR$/related_papers" />
+      <excludeFolder url="file://$MODULE_DIR$/software" />
+      <excludeFolder url="file://$MODULE_DIR$/summary" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/zdock" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.7 (RNP)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
