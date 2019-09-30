@@ -54,7 +54,7 @@ def write_dic_to_file(file, unique_dictionary, allchain_dic):
 		exp = unique_dictionary[vecid][0]
 		count_vector = unique_dictionary[vecid][1]
 		# fetch 'allchains' by vec_id
-		allchains = allchain_dic[vecid]
+		allchains = round(int(allchain_dic[vecid])/int(sum(count_vector)), 1)
 		with open(file, 'a') as fo:
 			fo.writelines(f'{vecid},{exp},')
 			i = 0
@@ -72,7 +72,7 @@ def append_or_add(unique_dic, vecid, exp, count_vector):
 		unique_dic[vecid]  = [exp, count_vector]
 	else:
 		new_ct_vec = [unique_dic[vecid][1][i] + count_vector[i] for i in range(80)]
-		unique_dic[vecid]  = [exp, new_ct_vec]
+		unique_dic[vecid] = [exp, new_ct_vec]
 	return unique_dic
 
 

@@ -117,8 +117,8 @@ with open(hbond_summary, 'a') as fo:
 									continue
 								else:
 									pr.append(pinfo_dic[key])
-						all_chains = len(pp) + len(rp) + len(pr) + len(rr)
-						all_chains_3 = len([num for num in pp if num >= 3]) + len([num for num in pr if num >= 3]) + len([num for num in rp if num >= 3]) + len([num for num in rr if num >= 3])
+						all_chains = sum(pp) + sum(rp) + sum(pr) + sum(rr)
+						all_chains_3 = sum([num for num in pp if num >= 3]) + sum([num for num in pr if num >= 3]) + sum([num for num in rp if num >= 3]) + sum([num for num in rr if num >= 3])
 						fo.writelines(f'{pdbid}	{exp}	{presi}	{pchain}	{rresi}	{rchain}	{sorted(pp)}	{sorted(pr)}	{sorted(rp)}	{sorted(rr)}	{all_chains}	{all_chains_3}\n')
 					except KeyError:
 						# print(f'{exp}_KEYERROR!!!!')

@@ -21,7 +21,6 @@ def gen_vectors(path, opath):
 	# functions
 	# ----------------------------------------------------------
 
-
 	# takes amino acid and bbace, and return the index of the list
 	def locate_pair(amino, bace):
 		# 0      1      2       3       4
@@ -44,10 +43,13 @@ def gen_vectors(path, opath):
 
 	def judge_native_vector(vec_id, vec):
 		vec_id = f"{vec_id.split('_')[0]}_{vec_id.split('_')[1][-1]}_{vec_id.split('_')[2]}"
-		if native_dic[vec_id] == vec:
-			return True
-		else:
-			return False
+		try:
+			if native_dic[vec_id] == vec:
+				return True
+			else:
+				return False
+		except KeyError:
+			pass
 
 
 	# add or append the count vector to exsinting one if any
@@ -122,7 +124,7 @@ def gen_vectors(path, opath):
 				unique_dic = append_or_add(unique_dic, vec_id, element[1], vector) # unique_dic updated
 			# 0		1		2		3		4		5		6	7	8	9	10			11
 			# pdbid	exp		presi	pchain	rresi	rchain	pp	pr	rp	rr	allchains	allchains3
-			# 2cv1	xray	THR		A		A		C
+			# 2von	dck		ARG		392A	A		C
 			element = lines.split('\t')
 			pdbid = element[0]
 			pchain = element[3]
@@ -136,6 +138,7 @@ def gen_vectors(path, opath):
 				continue
 
 			vec_id = f'{pdbid}_{pchain}_{rchain}'
+
 			if last_vec_id == '' or last_vec_id == vec_id: # the first data row or continued row
 				vector = add_one(element[2], element[4], vec_id, vector)
 			elif vec_id != last_vec_id: # different chain pair

@@ -4,13 +4,13 @@
 # output: a folder of chimera style output
 # ----------------------------------------------------------
 
+# ----------------------------------------------------------
+# import
+# ----------------------------------------------------------
+import os
+
 
 def hbout_to_chimeraout(i_path, o_path):
-
-	# ----------------------------------------------------------
-	# import
-	# ----------------------------------------------------------
-	import os
 
 	# ----------------------------------------------------------
 	# constants
@@ -57,7 +57,23 @@ def hbout_to_chimeraout(i_path, o_path):
 						fo.writelines(f'#0 {resi1} 1.{chain1} {atom1} #0 {resi2} 1.{chain2} {atom2}\n')
 
 
-input_path = '/Users/tkimura/Desktop/RNP/zdock/hb2/3iyq/'
-output_path = '/Users/tkimura/Desktop/RNP/zdock/chimera_format/3iyq/'
+# ----------------------------------------------------------
+# constants
+# ----------------------------------------------------------
+idlist = ["2von_A_C","2y9h_O_P","1qa6_A_C","1hc8_B_D","6nut_A_D","6nme_A_G","5a7a_A_R","2go5_6_9","2om3_A_R","3j46_5_4","6i2n_D_U","5xwy_A_B","5mq0_V_3","3j0l_F_5","5y88_W_x","3iz4_B_A","4uft_B_R","6e9e_A_B","2xea_A_R","3izz_F_D","3j0q_k_9","5fn1_A_B","3izy_P_N","6iv6_A_G","3j0d_G_A","4ue4_C_A","2xkv_C_B","3j06_A_R","3iyq_B_A","4udv_A_R","3iyr_B_A","5z9w_A_R","4d5n_A_X","6h5q_B_R","6h5s_C_E","1mj1_A_D","5a79_A_R"]
+ipath = '/Users/tkimura/Desktop/RNP/zdock/hb2/'
+opath = '/Users/tkimura/Desktop/RNP/zdock/chimera_format/'
 
-hbout_to_chimeraout(input_path, output_path)
+# ----------------------------------------------------------
+# main
+# ----------------------------------------------------------
+for id in idlist:
+	pdbid = id.split('_')[0]
+	# pchain = id.split('_')[1]
+	# rchain = id.split('_')[2]
+	if not os.path.exists(opath + pdbid):
+		os.mkdir(opath + pdbid)
+	if len(os.listdir(opath + pdbid)) > 3599:
+		continue
+	hbout_to_chimeraout(ipath + pdbid + '/', opath + pdbid + '/')
+
