@@ -9,6 +9,7 @@
 import pandas as pd
 import sklearn.svm as svm
 import numpy as np
+import warnings
 
 # ----------------------------------------------------------
 # constants
@@ -17,6 +18,7 @@ non_natives = "/Users/tkimura/Desktop/RNP/zdock/vectors.csv"
 natives = "/Users/tkimura/Desktop/RNP/check_contact/non_redun_positives.txt"
 EM_reso = "/Users/tkimura/Desktop/RNP/filterEM/reso_summary.csv"
 fig_path = "/Users/tkimura/Desktop/RNP/svm/svm_test.png"
+out_file = "/Users/tkimura/Desktop/RNP/svm/svm_out.csv"
 column_list = ['ALA_A', 'ALA_C', 'ALA_G', 'ALA_U', 'ARG_A', 'ARG_C',
 			   'ARG_G', 'ARG_U', 'ASN_A', 'ASN_C', 'ASN_G', 'ASN_U', 'ASP_A', 'ASP_C',
 			   'ASP_G', 'ASP_U', 'CYS_A', 'CYS_C', 'CYS_G', 'CYS_U', 'GLU_A', 'GLU_C',
@@ -30,80 +32,134 @@ column_list = ['ALA_A', 'ALA_C', 'ALA_G', 'ALA_U', 'ARG_A', 'ARG_C',
 			   'VAL_G', 'VAL_U', ]
 
 # ----------------------------------------------------------
-# functions
+# preprocess
+# add necessary columns to dataframes, make some lists
 # ----------------------------------------------------------
-
-# ----------------------------------------------------------
-# main
-# ----------------------------------------------------------
-
-# preprocess : add 'pdbid' column to each dataframe
-df_nega = pd.read_csv(non_natives)
-df_nega["pdbid"] = df_nega.apply(lambda row: row.vec_id[0:4], axis=1)
-df_nega["chpair"] = df_nega.apply(lambda row: row.vec_id[-3:], axis=1)
-
+df_nega = pd.read_csv(non_natives) # includes pose number '1abc_100_A_B'
+df_nega["pdbid"] = df_nega.apply(lambda row: row.vec_id.split('_')[0] + '_' + row.vec_id.split('_')[2] + '_' + row.vec_id.split('_')[3], axis=1)
 nega_pdbid_list = df_nega['pdbid'].unique()
-
 df_posi = pd.read_csv(natives)
 df_posi["pdbid"] = df_posi.apply(lambda row: row.vec_id[0:4], axis=1)
-df_posi["chpair"] = df_posi.apply(lambda row: row.vec_id.replace(row.vec_id[0:4], ''), axis=1)
-
 df_EMreso = pd.read_csv(EM_reso, header=None)
-
 df_tmp = df_EMreso[df_EMreso[1] != ' .']
 df_tmp['reso'] = df_tmp[1].astype(float)
 df_lt35 = df_tmp[df_tmp['reso'] <= 3.5]
-
 good_EM_list = df_lt35[0].to_list()
-
-# make the run list ## need to increase the final list??
-
-posi_pdbid_list = df_posi["pdbid"].unique()
+posi_pdbid_list = df_posi["vec_id"].unique()
 run_list = []
 
 for id in nega_pdbid_list:
-	if id in good_EM_list and id in posi_pdbid_list:
-		run_list.append(id)
+	if id[0:4] in good_EM_list:
+		if id in posi_pdbid_list:
+			run_list.append(id)
 
-### RUN SVM
-# good_EM_list : a list of EM with resolution <= 3.5
-# df_posi, df_nega : vectors in df
+with open(out_file, 'w') as fo:
+	fo.writelines(f'chain,posi_count,native_exist,c_value,iter,w_vec\n')
 
-for id in run_list:
-	print(f'running {id} ....')
-	posi_1_df = df_posi[df_posi['pdbid'] == id and df_posi['pdbid'] == id][column_list]
-	posi_array = posi_1_df.values
+	# ----------------------------------------------------------
+	# main
+	# good_EM_list : a list of EM with resolution <= 3.5
+	# df_posi, df_nega : vectors in df
+	# ----------------------------------------------------------
+	for id in run_list:
+		print(f'running {id}...')
+		chain = id
+		id = id[0:4]
+		posi_1_df = df_posi[df_posi['vec_id'] == chain][column_list]
+		posi_array = posi_1_df.values
+		nega_1_df = df_nega[df_nega['pdbid'] == chain][column_list]
+		nega_array = nega_1_df.values
 
-	nega_1_df = df_nega[df_nega['pdbid'] == id][column_list]
-	nega_array = nega_1_df.values
+		# remove a vector that's same as the positive if any
+		new_list = []
+		for array in nega_array.to_list():
+			if np.array_equal(posi_array, array):
+				continue
+			else:
+				new_list.append(array)
+		posi_array = array(new_list)
 
-	print(type(nega_array))
-	print(type(posi_array))
+		data_array = np.concatenate((posi_array, nega_array), axis=0)
+		labels = [0] * (len(nega_array) + 1)
+		labels[0] = 1
+		c_value = 0.0001
+		rate = 10
+		last_posi_count = 10000
+		converged = 0
 
-	data_array = np.concatenate((posi_array, nega_array), axis=0)
-	print(f'{len(posi_array)} positives')
-	print(f'{len(nega_array)} negatives')
-	print(f'{len(data_array)} vectors')
-	labels = [0] * (len(nega_array) + 1)
-	labels[0] = 1
-	print(f'{len(labels)} labels')
+		############################
+		# run SVM until convergence
+		############################
+		for i in range(0, 30):
+			with warnings.catch_warnings():
+				warnings.simplefilter('ignore')
+				lin_clf = svm.LinearSVC(C=c_value, class_weight='balanced')
+				lin_clf.fit(data_array, labels)
+				dec = lin_clf.decision_function(data_array)
 
-	## SVM
-	lin_clf = svm.LinearSVC()
-	lin_clf.fit(data_array, labels)
-	dec = lin_clf.decision_function(data_array)
+				native_exist = lin_clf.predict(data_array)[0]
+				posi_count = 0
+				scores = lin_clf.predict(data_array)
+				for score in scores:
+					if score > 0:
+						posi_count += 1
 
-	# index of predicted positive data
-	print(lin_clf.predict(data_array).nonzero())
+				w_vec = lin_clf.coef_
+				bias = lin_clf.intercept_
 
-	# scores
-	scores = lin_clf.decision_function(data_array)
-	for score in scores:
-		if score > 0:
-			print(score)
+				########################################################
+				#  exit when converged
+				########################################################
+				if posi_count == 1 and native_exist == 1:
+					converged = 1
+					print('normally converged')
+					fo.writelines(f"{chain},{posi_count},{native_exist},{c_value},{i + 1},{str(w_vec.tolist()).strip('[').strip(']')},{bias}\n")
+					break
+				else:
+					print(f'itr: {i}, posi:{posi_count}, c_value:{c_value}, native:{native_exist}')
 
-	# weight vectors?
-	print(lin_clf.coef_)
+				########################################################
+				#  remember values to use later
+				########################################################
+				if posi_count > 1 and posi_count < last_posi_count:
+					two_last_posi_count = posi_count
+					two_last_c_value = c_value
+					last_c_value = c_value
+					two_last_w_vec = w_vec
 
-	# length of w
-	print(len(lin_clf.coef_[0]))
+				########################################################
+				#  change mode to update c_value depending on the state
+				########################################################
+
+				# A normal update
+				if (last_posi_count > 1 and posi_count > 1 and last_posi_count > posi_count)\
+					or (last_posi_count == 1 and last_native_exist == 0 and posi_count > 1 and posi_count < two_last_posi_count)\
+					or (last_posi_count == 0 and posi_count > 1 and posi_count < two_last_posi_count):
+					c_value = c_value * rate
+				# B
+				elif (last_posi_count > 1 and posi_count > 1 and last_posi_count <= posi_count)\
+					or (last_posi_count > 1 and native_exist == 0 and posi_count == 1)\
+					or (last_posi_count > 1 and posi_count == 0):
+					c_value = (last_c_value + c_value) / 2
+				# C
+				elif (last_posi_count == 0 and posi_count == 0)\
+					or (last_posi_count == 0 and posi_count == 1 and native_exist == 0)\
+					or (last_posi_count == 1 and last_native_exist == 0 and posi_count == 1 and native_exist == 0)\
+					or (last_posi_count == 1 and last_native_exist == 0 and posi_count == 0)\
+					or (last_posi_count == 1 and last_native_exist == 0 and posi_count > 1 and posi_count >= two_last_posi_count)\
+					or (last_posi_count == 0 and posi_count > 1 and posi_count >= two_last_posi_count):
+					c_value = (two_last_c_value + c_value) / 2
+
+				last_posi_count = posi_count
+				last_native_exist = native_exist
+
+				# remember best values in case of no convergence
+				if native_exist == 1 and posi_count > 0:
+					best_posi_count = posi_count
+					best_native_exist = native_exist
+					best_c_value = c_value
+					best_w_vec = w_vec
+
+		if converged == 0:
+			print('not converged')
+			fo.writelines(f"{chain},{best_posi_count},{best_native_exist},{best_c_value},{i + 1},{str(w_vec.tolist()).strip('[').strip(']')},{bias}\n")

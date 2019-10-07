@@ -2,8 +2,7 @@
 # this code is for extracting nonredundant positive dataset
 # with simplest classification : amino acid - base
 # ----------------------------------------------------------
-
-def gen_vectors(path, opath):
+def non_redundant_negatives(ipath, opath):
 
 	# ----------------------------------------------------------
 	# import
@@ -114,7 +113,7 @@ def gen_vectors(path, opath):
 	# ----------------------------------------------------------
 	# main
 	# ----------------------------------------------------------
-	with open(path) as f:
+	with open(ipath) as f:
 		last_vec_id = ''
 		open_ofile()
 		for lines in f.readlines():
@@ -148,9 +147,3 @@ def gen_vectors(path, opath):
 			last_vec_id = vec_id
 		# write unique_dic to the file
 		write_dic_to_file(opath, unique_dic)
-
-
-ifile = '/Users/tkimura/Desktop/RNP/zdock/hbond_summary.csv'
-ofile = '/Users/tkimura/Desktop/RNP/zdock/vectors.csv'
-
-gen_vectors(ifile, ofile)
