@@ -42,6 +42,8 @@ def hbond_summary_to_classify(ipath, opath):
 			for dir in os.listdir(from_path):
 				if '.DS' in dir:
 					continue
+				if len(dir) < 5:
+					continue
 				for file in os.listdir(from_path + dir):
 					if '.DS' in file:
 						continue

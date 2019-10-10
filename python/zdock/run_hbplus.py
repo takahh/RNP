@@ -26,13 +26,14 @@ def run_hbplus(ipath, opath):
 				if files.replace('pdb', 'hb2') not in ofile_list:
 					subprocess.call(['hbplus', in_folder + files])
 			else:
+				print('passing...')
 				pass
 
 	# ----------------------------------------------------------
 	# main
 	# ----------------------------------------------------------
 	for id in os.listdir(ipath):
-		if '.DS' in id:
+		if '.DS' in id or len(id) == 4:
 			continue
 		if not os.path.exists(opath + id):
 			os.mkdir(opath + id)
