@@ -27,7 +27,7 @@ vector = '/Users/tkimura/Desktop/RNP/zdock/vectors.csv'
 # ----------------------------------------------------------
 # main
 # ----------------------------------------------------------
-run_hbplus(poses, hb2)
+# run_hbplus(poses, hb2)
 hbplus_to_chimera(hb2, chimera)
 clean_hbout(chimera, cleaned)
 hbond_summary_to_classify(cleaned, summary)

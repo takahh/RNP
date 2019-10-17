@@ -40,7 +40,7 @@ def clean_hbout(ipath, opath):
 			continue
 		if not os.path.exists(opath + dir):
 			os.mkdir(opath + dir)
-		if len(os.listdir(opath + id)) > 3590:
+		if len(os.listdir(opath + dir)) > 3590:
 			print(f'skip {id}')
 			continue
 		else:

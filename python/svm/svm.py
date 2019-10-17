@@ -36,48 +36,44 @@ column_list = ['ALA_A', 'ALA_C', 'ALA_G', 'ALA_U', 'ARG_A', 'ARG_C',
 # add necessary columns to dataframes, make some lists
 # ----------------------------------------------------------
 df_nega = pd.read_csv(non_natives) # includes pose number '1abc_100_A_B'
-df_nega["pdbid"] = df_nega.apply(lambda row: row.vec_id.split('_')[0] + '_' + row.vec_id.split('_')[2] + '_' + row.vec_id.split('_')[3], axis=1)
-nega_pdbid_list = df_nega['pdbid'].unique()
+df_nega["vec_id_cld"] = df_nega.apply(lambda row: row.vec_id.split('_')[0] + '_' + row.vec_id.split('_')[1] + '_' + row.vec_id.split('_')[2], axis=1)
+nega_pdbid_list = df_nega['vec_id_cld'].unique()
 df_posi = pd.read_csv(natives)
-df_posi["pdbid"] = df_posi.apply(lambda row: row.vec_id[0:4], axis=1)
-df_EMreso = pd.read_csv(EM_reso, header=None)
-df_tmp = df_EMreso[df_EMreso[1] != ' .']
-df_tmp['reso'] = df_tmp[1].astype(float)
-df_lt35 = df_tmp[df_tmp['reso'] <= 3.5]
-good_EM_list = df_lt35[0].to_list()
+# df_posi["pdbid"] = df_posi.apply(lambda row: row.vec_id[0:4], axis=1)
+# df_EMreso = pd.read_csv(EM_reso, header=None)
+# df_tmp = df_EMreso[df_EMreso[1] != ' .']
+# df_tmp['reso'] = df_tmp[1].astype(float)
+# df_lt35 = df_tmp[df_tmp['reso'] <= 3.5]
+# good_EM_list = df_lt35[0].to_list()
 posi_pdbid_list = df_posi["vec_id"].unique()
 run_list = []
 
 for id in nega_pdbid_list:
-	if id[0:4] in good_EM_list:
-		if id in posi_pdbid_list:
-			run_list.append(id)
+	if id in posi_pdbid_list:
+		run_list.append(id)
 
 with open(out_file, 'w') as fo:
-	fo.writelines(f'chain,posi_count,native_exist,c_value,iter,w_vec\n')
-
+	fo.writelines(f'chain,posi_count,native_exist,c_value,iter,w_vec,{column_list}\n')
 	# ----------------------------------------------------------
-	# main
 	# good_EM_list : a list of EM with resolution <= 3.5
 	# df_posi, df_nega : vectors in df
 	# ----------------------------------------------------------
 	for id in run_list:
 		print(f'running {id}...')
 		chain = id
-		id = id[0:4]
-		posi_1_df = df_posi[df_posi['vec_id'] == chain][column_list]
+		posi_1_df = df_posi[df_posi['vec_id'] == id][column_list]
 		posi_array = posi_1_df.values
-		nega_1_df = df_nega[df_nega['pdbid'] == chain][column_list]
+		nega_1_df = df_nega[df_nega['vec_id_cld'] == id][column_list]
 		nega_array = nega_1_df.values
 
 		# remove a vector that's same as the positive if any
 		new_list = []
-		for array in nega_array.to_list():
+		for array in nega_array.tolist():
 			if np.array_equal(posi_array, array):
 				continue
 			else:
 				new_list.append(array)
-		posi_array = array(new_list)
+		nega_array = np.asarray(new_list)
 
 		data_array = np.concatenate((posi_array, nega_array), axis=0)
 		labels = [0] * (len(nega_array) + 1)

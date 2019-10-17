@@ -48,14 +48,16 @@ def hbplus_to_chimera(ipath, opath):
 							if "n    s   type" in lines:
 								go = 1
 						elif go == 1:
-							resi1 = lines[6:9].replace(' ', '')
-							atom1 = lines[10:14].replace(' ', '')
-							chain1 = lines[0].replace(' ', '')
-							resi2 = lines[20:23].replace(' ', '')
-							atom2 = lines[24:28].replace(' ', '')
-							chain2 = lines[14].replace(' ', '')
-							fo.writelines(f'#0 {resi1} 1.{chain1} {atom1} #0 {resi2} 1.{chain2} {atom2}\n')
-
+							try:
+								resi1 = lines[6:9].replace(' ', '')
+								atom1 = lines[10:14].replace(' ', '')
+								chain1 = lines[0].replace(' ', '')
+								resi2 = lines[20:23].replace(' ', '')
+								atom2 = lines[24:28].replace(' ', '')
+								chain2 = lines[14].replace(' ', '')
+								fo.writelines(f'#0 {resi1} 1.{chain1} {atom1} #0 {resi2} 1.{chain2} {atom2}\n')
+							except IndexError:
+								pass
 	# ----------------------------------------------------------
 	# main
 	# ----------------------------------------------------------
@@ -64,7 +66,7 @@ def hbplus_to_chimera(ipath, opath):
 			continue
 		if not os.path.exists(opath + dir):
 			os.mkdir(opath + dir)
-		if len(os.listdir(opath + id)) > 3590:
+		if len(os.listdir(opath + dir)) > 3590:
 			print(f'skip {id}')
 			continue
 		print(f'{dir} is being processed')
