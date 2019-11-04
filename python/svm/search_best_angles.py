@@ -7,6 +7,7 @@
 # import
 # ----------------------------------------------------------
 import pandas as pd
+from python.resolutions.resolution_list import resolution_list as reso
 
 # ----------------------------------------------------------
 # constants
@@ -18,6 +19,8 @@ svm = '/Users/tkimura/Desktop/RNP/svm/svm_out_normed.csv'
 
 df_svm = pd.read_csv(svm)
 all_list = df_svm['chain'].values.tolist()
+
+reso_limit = 2.5
 
 # ----------------------------------------------------------
 # functions
@@ -45,9 +48,22 @@ for i in range(6):
 with open(output, 'w') as fo:
 	fo.writelines('id, count, min_angle, max_angle, average, gap\n')
 
+################################################
+# filter max_df by resolution
+################################################
+df_max['short_id'] = df_max['id'].str[:4]
+selected_max_df = df_max.merge(reso(reso_limit), left_on='short_id', right_on='id')
+
+################################################
+# filter min_df by resolution
+################################################
+df_min['short_id'] = df_min['id'].str[:4]
+selected_min_df = df_min.merge(reso(reso_limit), left_on='short_id', right_on='id')
+
+
 for c in range(79):
-	max_list = df_max[str(c)].values.tolist()
-	min_list = df_min[str(c)].values.tolist()
+	max_list = selected_max_df[str(c)].values.tolist()
+	min_list = selected_min_df[str(c)].values.tolist()
 	# find a minimum gap
 	all_list = max_list + min_list
 

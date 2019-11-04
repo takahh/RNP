@@ -9,6 +9,7 @@
 import numpy as np
 import math
 import pandas as pd
+import pandas.errors as pde
 
 # ----------------------------------------------------------
 # constants
@@ -17,7 +18,7 @@ import pandas as pd
 svm = '/Users/tkimura/Desktop/RNP/svm/svm_out_normed.csv'
 negatives = "/Users/tkimura/Desktop/RNP/zdock/vectors.csv"
 negatives_dir = "/Users/tkimura/Desktop/RNP/zdock/vectors/"
-positive = "/Users/tkimura/Desktop/RNP/check_contact/non_redun_positives.txt"
+positive = "/Users/tkimura/Desktop/RNP/check_contact/non_redun_positives_atom.txt"
 angles = []
 debug = '/Users/tkimura/Desktop/RNP/svm/debug.csv'
 
@@ -27,7 +28,7 @@ debug = '/Users/tkimura/Desktop/RNP/svm/debug.csv'
 # df_nega = pd.read_csv(negatives)
 # df_nega['vec_id_short'] = df_nega['vec_id'].apply(lambda x: x.split('_')[0] + '_' + x.split('_')[1] + '_' + x.split('_')[2])
 df_posi = pd.read_csv(positive)
-num_list = list(range(79))
+num_list = list(range(159))
 
 # make a column list for output file
 column_names = ['id']
@@ -35,6 +36,7 @@ for i in range(len(num_list)):
 	column_names.append(',' + str(num_list[i]))
 column_names.append('\n')
 
+# # devide vector.csv to indi
 # idlist = df_nega.vec_id_short.unique().tolist()
 # for id in idlist: # divide a large file into pieces
 # 	df = df_nega[df_nega['vec_id_short'] == id]
@@ -48,7 +50,7 @@ column_names.append('\n')
 # convert cartesian to polar coordinates
 def car2pol(vec):
 	pol = []
-	for i in range(0, 79):
+	for i in range(0, 159):
 		tsum = 0
 
 		# calculate the denominator part
@@ -61,7 +63,7 @@ def car2pol(vec):
 			pol.append(0)
 		else:
 			# calculate each polar
-			if i != 78:
+			if i != 158:
 				pol.append(np.arccos(vec[i]/tsum**0.5))
 			else:
 				if vec[-1] >= 0:
@@ -74,9 +76,9 @@ def car2pol(vec):
 # convert polar to cartesian coordinates
 def pol2car(pol):
 	vec = []
-	for i in range(0, 80): # i == 79
+	for i in range(0, 160): # i == 79
 		val = 1
-		if i != 79:
+		if i != 159:
 			for j in range(i + 1): # i == 79, j = 0 - 79
 				if j != i: # except j = 79
 					val *= math.sin(pol[j])
@@ -94,10 +96,10 @@ def count_posi(pol, id):
 	vec = pol2car(pol) # weights to cartesian for calculating dot product
 	wx_list = []
 	df_nega_target = pd.read_csv(negatives_dir + id + '.csv')
-	posi_vec = df_posi[df_posi['vec_id'] == id].values.tolist()[0][2:82]
+	posi_vec = df_posi[df_posi['vec_id'] == id].values.tolist()[0][2:162]
 	# calcluate wx and make a dataframe
 	for index, row in df_nega_target.iterrows():
-		n_vec = row.tolist()[3:83]
+		n_vec = row.tolist()[3:163]
 		wx = sum([x * y for x, y in zip(n_vec, vec)])
 		wx_list.append([0, wx])
 	wx = sum([x * y for x, y in zip(posi_vec, vec)])
@@ -137,7 +139,7 @@ def write_a_list(pairid, pollist, outfile):
 
 
 def sweep_angles(outfile, mode, polar, initial_rank, limit_polar, chid, initial_incre, half_rate, cv_thrhd):
-	for j in range(79):
+	for j in range(159):
 		print(j)
 		# ----------------------------------------------
 		# initialize variables
@@ -166,8 +168,8 @@ def sweep_angles(outfile, mode, polar, initial_rank, limit_polar, chid, initial_
 			# ----------------------------------------------
 			#  restart the previous when the rank changes
 			# or the increase was beyond the angle range
-			if (j != 78 and (tmp_pol[j] < 0 or tmp_pol[j] > np.pi)) \
-				or (j == 78 and (tmp_pol[j] < 0 or tmp_pol[j] > 2 * np.pi))\
+			if (j != 158 and (tmp_pol[j] < 0 or tmp_pol[j] > np.pi)) \
+				or (j == 158 and (tmp_pol[j] < 0 or tmp_pol[j] > 2 * np.pi))\
 				or (initial_rank != rank):
 				incre[j] = incre[j] * half_rate
 				tmp_pol = best_pol
@@ -193,7 +195,10 @@ def sweep_angles(outfile, mode, polar, initial_rank, limit_polar, chid, initial_
 
 # check if the id is already in the output
 def check_done(pair_id, outfile):
-	df = pd.read_csv(outfile)
+	try:
+		df = pd.read_csv(outfile)
+	except pde.EmptyDataError:
+		return 0
 	if pair_id in df['id'].values.tolist():
 		return 1
 	else:
@@ -205,16 +210,18 @@ def find_limit(id_list, converge_thrhd, half_rate, rank):
 	range_min = '/Users/tkimura/Desktop/RNP/svm/w_range_min_' + str(rank) + '.csv'
 	initialize_file(range_max)
 	initialize_file(range_min)
-	with open(debug, 'a') as f:
-		f.writelines(id_list)
+	# with open(debug, 'a') as f:
+	# 	f.writelines(id_list)
 
 	for id in id_list:
 		if check_done(id, range_min) == 1:
+			with open(debug, 'a') as f:
+				f.writelines('at' + str(rank) + ',' + str(id) + ' already exists')
 			continue
-		init_incre = [1/(np.pi)] * 79
+		init_incre = [1/(np.pi)] * 159
 		with open(debug, 'a') as f:
 			try:
-				vec = df_svm[df_svm['chain'] == id].values.tolist()[0][5:85]  # svm'ed solution : Cartesian
+				vec = df_svm[df_svm['chain'] == id].values.tolist()[0][5:165]  # svm'ed solution : Cartesian
 			except IndexError:
 				f.writelines('Indexerror\n')
 				f.writelines(df_svm[df_svm['chain'] == id].values.tolist())
@@ -222,7 +229,7 @@ def find_limit(id_list, converge_thrhd, half_rate, rank):
 				continue
 		pol = car2pol(vec)  # to polar: initial angles
 		ini_rank = count_posi(pol, id) # keep this rank
-		limit_pol = [0] * 79
+		limit_pol = [0] * 159
 
 		sweep_angles(range_max, 'max', pol, ini_rank, limit_pol, id, init_incre, half_rate, converge_thrhd)
 		sweep_angles(range_min, 'min', pol, ini_rank, limit_pol, id, init_incre, half_rate, converge_thrhd)
@@ -242,38 +249,38 @@ size = comm.Get_size()
 max_all_chain = 0.1 # filter id by the frequency of contacts
 
 df_svm = pd.read_csv(svm)
-all_list = df_posi[df_posi['all_chains'] <= max_all_chain]['vec_id'].unique().tolist()
-# all_list = df_svm.chain.unique().tolist()
-
-# if rank == 0:
-# 	id_list = all_list[0:43]
-# if rank == 1:
-# 	id_list = all_list[43:86]
-# if rank == 2:
-# 	id_list = all_list[86:129]
-# if rank == 3:
-# 	id_list = all_list[129:172]
-# if rank == 4:
-# 	id_list = all_list[172:215]
-# if rank == 5:
-# 	id_list = all_list[215:258]
-# elif rank == 6:
-# 	id_list = all_list[258:300]
+# all_list = df_posi[df_posi['all_chains'] <= max_all_chain]['vec_id'].unique().tolist()
+all_list = df_svm.chain.unique().tolist()
 
 if rank == 0:
-	id_list = all_list[0:9]
+	id_list = all_list[0:43]
 if rank == 1:
-	id_list = all_list[9:18]
+	id_list = all_list[43:86]
 if rank == 2:
-	id_list = all_list[18:27]
+	id_list = all_list[86:129]
 if rank == 3:
-	id_list = all_list[27:36]
+	id_list = all_list[129:172]
 if rank == 4:
-	id_list = all_list[36:45]
+	id_list = all_list[172:215]
 if rank == 5:
-	id_list = all_list[45:54]
+	id_list = all_list[215:258]
 elif rank == 6:
-	id_list = all_list[54:60]
+	id_list = all_list[258:300]
+
+# if rank == 0:
+# 	id_list = all_list[0:9]
+# if rank == 1:
+# 	id_list = all_list[9:18]
+# if rank == 2:
+# 	id_list = all_list[18:27]
+# if rank == 3:
+# 	id_list = all_list[27:36]
+# if rank == 4:
+# 	id_list = all_list[36:45]
+# if rank == 5:
+# 	id_list = all_list[45:54]
+# elif rank == 6:
+# 	id_list = all_list[54:60]
 
 converge_thrhd = 0.000001
 half_rate = 0.3

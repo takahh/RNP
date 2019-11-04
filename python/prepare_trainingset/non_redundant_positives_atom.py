@@ -6,7 +6,7 @@
 # ----------------------------------------------------------
 # constants
 # ----------------------------------------------------------
-path = '/Users/tkimura/Desktop/RNP/check_contact/hbond_summary.txt'
+path = '/Users/tkimura/Desktop/RNP/check_contact/hbond_summary_atom.txt'
 opath = '/Users/tkimura/Desktop/RNP/check_contact/non_redun_positives_atom.txt'
 aminos = ['ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLU', 'GLN', 'GLY', 'HIS', 'ILE', 'LEU', 'LYS', 'MET', 'PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL']
 baces = ['A', 'C', 'G', 'U']
@@ -40,6 +40,7 @@ def locate_pair(amino, bace, patom, ratom):
 	# Ala-A  Ala-C	Ala-G	Ala-U	Arg-A
 	try:
 		if ratom in bbatom:
+			print(4 * aminos.index(amino) + baces.index(bace) + 80)
 			return 4 * aminos.index(amino) + baces.index(bace) + 80
 		else:
 			return 4 * aminos.index(amino) + baces.index(bace)
@@ -60,7 +61,7 @@ def write_dic_to_file(file, unique_dictionary, allchain_dic):
 			fo.writelines(f'{vecid},{exp},')
 			i = 0
 			for item in count_vector:
-				if i == 79:
+				if i == 159:
 					fo.writelines(f'{item},{allchains}\n')
 				else:
 					fo.writelines(f'{item},')
@@ -72,7 +73,7 @@ def append_or_add(unique_dic, vecid, exp, count_vector):
 	if vec_id not in unique_dic.keys():
 		unique_dic[vecid]  = [exp, count_vector]
 	else:
-		new_ct_vec = [unique_dic[vecid][1][i] + count_vector[i] for i in range(80)]
+		new_ct_vec = [unique_dic[vecid][1][i] + count_vector[i] for i in range(160)]
 		unique_dic[vecid] = [exp, new_ct_vec]
 	return unique_dic
 
@@ -80,9 +81,10 @@ def append_or_add(unique_dic, vecid, exp, count_vector):
 # make a string of column names separated by a comma
 def make_column_names():
 	column_strings = 'vec_id,exp'
-	for amino in aminos:
-		for bace in baces:
-			column_strings = f'{column_strings},{amino}_{bace}'
+	for side in back_or_side:
+		for amino in aminos:
+			for bace in baces:
+				column_strings = f'{column_strings},{amino}_{bace}_{side}'
 	column_strings = f'{column_strings},all_chains'
 	return column_strings
 
@@ -125,20 +127,20 @@ with open(path) as f:
 		rchain = element[5]
 		presi = element[2]
 		rresi = element[4]
-		patom = element[12]
-		ratom = element[13]
+		patom = element[12].strip()
+		ratom = element[13].strip()
 
 		# skip if the residue or the base is uncanonical
 		if presi not in aminos or rresi not in baces:
-			print(lines)
+			# print(lines)
 			continue
 
 		vec_id = f'{pdbid}_{pchain}_{rchain}'
-		if last_vec_id == '' or last_vec_id == vec_id: # the first data row or continued row
+		if last_vec_id == vec_id: # the first data row or continued row
 			vector = add_one(element[2], element[4], vec_id, vector, patom, ratom)
-		elif vec_id != last_vec_id: # continued pdbid
+		elif vec_id != last_vec_id or last_vec_id == '': # continued pdbid
 			unique_dic = append_or_add(unique_dic, vec_id, element[1], vector) # unique_dic updated
-			vector = [0] * 80
+			vector = [0] * 160
 			vector = add_one(element[2], element[4], vec_id, vector, patom, ratom)
 		last_vec_id = vec_id
 	# write unique_dic to the file

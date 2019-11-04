@@ -12,12 +12,14 @@
 # ----------------------------------------------------------
 import pandas as pd
 import math
+from python.resolutions.resolution_list import resolution_list as reso
 
 # ----------------------------------------------------------
 # constants
 # ----------------------------------------------------------
+limit_reso = 2.5
 means = "/Users/tkimura/Desktop/RNP/svm/best_w.csv"
-svm = '/Users/tkimura/Desktop/RNP/svm/svm_out.csv'
+svm = '/Users/tkimura/Desktop/RNP/svm/svm_out_normed_ori.csv'
 negatives = "/Users/tkimura/Desktop/RNP/zdock/vectors.csv"
 positive = "/Users/tkimura/Desktop/RNP/check_contact/non_redun_positives.txt"
 ranking_results = "/Users/tkimura/Desktop/RNP/svm/ranking_results.csv"
@@ -45,7 +47,8 @@ mode_list = ['mean', 'median']
 
 print(df_mean.columns)
 mean_angles = df_mean[' average'].values.tolist()
-max_all_chain = 0.1
+max_all_chain = 0.5
+id_list = []
 selected_list = df_posi[df_posi['all_chains'] <= max_all_chain]['vec_id'].unique().tolist()
 
 # ----------------------------------------------------------
@@ -64,6 +67,12 @@ def pol2car(pol):
 		vec.append(val)
 	return vec
 
+# make a list for vec_id limited by resolution
+reso_id_list = reso(limit_reso).index.to_list()
+for vec_id in df_svm['chain'].values:
+	if vec_id[0:4] in reso_id_list:
+		id_list.append(vec_id)
+
 # ----------------------------------------------------------
 # main
 # ----------------------------------------------------------
@@ -71,7 +80,6 @@ for mode in mode_list:
 	ranking_results = f'/Users/tkimura/Desktop/RNP/svm/ranking_results_{mode}.csv'
 	with open(ranking_results, 'w') as fo:
 		fo.writelines('id, rank, svm_rank\n')
-		id_list = df_svm['chain'].to_list()
 		for id in id_list:
 			if id not in selected_list:
 				continue
