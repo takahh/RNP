@@ -137,13 +137,10 @@ def non_redundant_negatives(ipath, opath):
 				continue
 
 			vec_id = f'{pdbid}_{pchain}_{rchain}'
+			vector = [0] * 80
+			# vector to increment
+			vector = add_one(element[2], element[4], vec_id, vector)
+			unique_dic = append_or_add(unique_dic, vec_id, element[1], vector) # unique_dic updated
 
-			if last_vec_id == '' or last_vec_id == vec_id: # the first data row or continued row
-				vector = add_one(element[2], element[4], vec_id, vector)
-			elif vec_id != last_vec_id: # different chain pair
-				unique_dic = append_or_add(unique_dic, vec_id, element[1], vector) # unique_dic updated
-				vector = [0] * 80
-				vector = add_one(element[2], element[4], vec_id, vector)
-			last_vec_id = vec_id
 		# write unique_dic to the file
 		write_dic_to_file(opath, unique_dic)

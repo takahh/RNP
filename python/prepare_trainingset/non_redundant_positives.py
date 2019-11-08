@@ -66,7 +66,7 @@ def write_dic_to_file(file, unique_dictionary, allchain_dic):
 				i += 1
 
 
-# add or append the count vector to exsinting one if any
+# add key if not any, and make a new vector or add the count vector to exsinting one
 def append_or_add(unique_dic, vecid, exp, count_vector):
 	if vec_id not in unique_dic.keys():
 		unique_dic[vecid]  = [exp, count_vector]
@@ -74,24 +74,6 @@ def append_or_add(unique_dic, vecid, exp, count_vector):
 		new_ct_vec = [unique_dic[vecid][1][i] + count_vector[i] for i in range(80)]
 		unique_dic[vecid] = [exp, new_ct_vec]
 	return unique_dic
-
-
-# make a string of column names separated by a comma
-def make_column_names():
-	column_strings = 'vec_id,exp'
-	for amino in aminos:
-		for bace in baces:
-			column_strings = f'{column_strings},{amino}_{bace}'
-	column_strings = f'{column_strings},all_chains'
-	return column_strings
-
-
-# open the output file bebfore adding rows
-def open_ofile():
-	with open(opath, 'w') as fo:
-		columns = make_column_names()
-		fo.writelines(columns)
-		fo.writelines('\n')
 
 
 # add 1 to the index of the vector
@@ -103,6 +85,25 @@ def add_one(presi, rresi, vecid, cvector):
 		return cvector
 	cvector[index] += 1
 	return cvector
+
+
+# make a string of column names separated by a comma
+def make_column_names():
+	column_strings = 'vec_id,exp'
+	for amino in aminos:
+		for bace in baces:
+			column_strings = f'{column_strings},{amino}_{bace}'
+	column_strings = f'{column_strings},all_chains'
+	print(column_strings)
+	return column_strings
+
+
+# open the output file bebfore adding rows
+def open_ofile():
+	with open(opath, 'w') as fo:
+		columns = make_column_names()
+		fo.writelines(columns)
+		fo.writelines('\n')
 
 
 # ----------------------------------------------------------
@@ -129,14 +130,11 @@ with open(path) as f:
 		if presi not in aminos or rresi not in baces:
 			print(lines)
 			continue
-
 		vec_id = f'{pdbid}_{pchain}_{rchain}'
-		if last_vec_id == '' or last_vec_id == vec_id: # the first data row or continued row
-			vector = add_one(element[2], element[4], vec_id, vector)
-		elif vec_id != last_vec_id: # continued pdbid
-			unique_dic = append_or_add(unique_dic, vec_id, element[1], vector) # unique_dic updated
-			vector = [0] * 80
-			vector = add_one(element[2], element[4], vec_id, vector)
-		last_vec_id = vec_id
+		vector = [0] * 80
+		# vector to increment
+		vector = add_one(element[2], element[4], vec_id, vector)
+		unique_dic = append_or_add(unique_dic, vec_id, element[1], vector) # unique_dic updated
+
 	# write unique_dic to the file
 	write_dic_to_file(opath, unique_dic, all_chains_dic)

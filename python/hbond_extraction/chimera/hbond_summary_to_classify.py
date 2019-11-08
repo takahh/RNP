@@ -66,7 +66,7 @@ with open(hbond_summary, 'a') as fo:
 		for file in os.listdir(hbpath1 + exp):
 			if '.DS' in file:
 				continue
-			with open(hbpath1 + exp + '/' +  file) as f:
+			with open(hbpath1 + exp + '/' + file) as f:
 				for lines in f.readlines(): # each hbond
 					# 0  1   2     3     4  5 6   7
 					# #0 ASN 212.A ND2   #0 U 5.P O4

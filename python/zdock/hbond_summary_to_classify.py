@@ -80,3 +80,5 @@ def hbond_summary_to_classify(ipath, opath):
 	sum_file = opath + 'hbond_summary.csv'
 
 	hb_to_summary(from_p, sum_file)
+
+hbond_summary_to_classify()

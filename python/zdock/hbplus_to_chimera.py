@@ -5,19 +5,20 @@
 # ----------------------------------------------------------
 
 
-def hbplus_to_chimera(ipath, opath):
+def hbplus_to_chimera(ipath, opath, id_list):
 	# ----------------------------------------------------------
 	# import
 	# ----------------------------------------------------------
 	import os
 
 
-	def hbout_to_chimeraout(i_path, o_path):
+	def hbout_to_chimeraout(i_path, o_path, id_list):
 		# ----------------------------------------------------------
 		# constants
 		# ----------------------------------------------------------
-		input_list = []
 		go = 0
+		input_list = []
+
 		# ----------------------------------------------------------
 		# functions
 		# ----------------------------------------------------------
@@ -27,8 +28,9 @@ def hbplus_to_chimera(ipath, opath):
 		# ----------------------------------------------------------
 		for file in os.listdir(i_path):
 			if '.DS' not in file:
-				input_list.append(i_path + file)
-		print(input_list)
+				if file in id_list:
+					input_list.append(i_path + file)
+
 		for file in input_list:
 			go = 0
 			with open(file) as f:
@@ -70,5 +72,5 @@ def hbplus_to_chimera(ipath, opath):
 			print(f'skip {id}')
 			continue
 		print(f'{dir} is being processed')
-		hbout_to_chimeraout(ipath + dir + '/', opath + dir + '/')
+		hbout_to_chimeraout(ipath + dir + '/', opath + dir + '/', id_list)
 
