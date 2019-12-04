@@ -56,7 +56,7 @@ def hbond_summary_to_classify(ipath, opath):
 							if len(element[1].strip()) == 3 and len(element[5].strip()) == 1:
 								presi = element[1].strip()
 								rresi = element[5].strip()
-								pchain = file.split('.')[1] + "_" + element[2].strip().split('.')[1]
+								pchain = file.split('.')[1] + "_" + element[2].strip().split('.')[1] # e.g. 2144_A
 								rchain = element[6].strip().split('.')[1]
 							elif len(element[1].strip()) == 1 and len(element[5].strip()) == 3:
 								presi = element[5].strip()
@@ -67,6 +67,7 @@ def hbond_summary_to_classify(ipath, opath):
 								continue # skip when pp or rr interactions
 
 							fo.writelines(f'{pdbid}	dck	{presi}	{pchain}	{rresi}	{rchain}\n')
+							print(f'{pdbid}	dck	{presi}	{pchain}	{rresi}	{rchain}')
 
 	# ----------------------------------------------------------
 	# import
@@ -81,4 +82,4 @@ def hbond_summary_to_classify(ipath, opath):
 
 	hb_to_summary(from_p, sum_file)
 
-hbond_summary_to_classify()
+# hbond_summary_to_classify()

@@ -11,12 +11,9 @@ import pandas as pd
 # ----------------------------------------------------------
 # constants
 # ----------------------------------------------------------
-path = '/Users/tkimura/Desktop/RNP/resolutions/'
-em_pdb = path + 'em_pdb.csv'
-em_cif = path + 'em_cif.csv'
+path = '/Users/tkimura/Desktop/RNP/pdb_date/'
 xray_pdb = path + 'xray_pdb.csv'
 xray_cif = path + 'xray_cif.csv'
-file_list = [em_pdb, em_cif, xray_pdb, xray_cif]
 
 # ----------------------------------------------------------
 # functions
@@ -25,26 +22,25 @@ file_list = [em_pdb, em_cif, xray_pdb, xray_cif]
 # ----------------------------------------------------------
 # main
 # ----------------------------------------------------------
-def resolution_list(limit_reso):
-	for file in file_list:
-		df = pd.read_csv(file, header=None)
-		if file == em_pdb:
-			pass
-		else:
-			df = pd.concat([df, last_df])
-		last_df = df
-	last_df.columns = ['id', 'resolution']
-	last_df.set_index('id', inplace=True)
+def date_list(limit_year):
+	df1 = pd.read_csv(xray_pdb, header=None)
+	df2 = pd.read_csv(xray_cif, header=None)
+	df = pd.concat([df1, df2])
+	df.columns = ['id', 'year']
+	# df.set_index('id', inplace=True)
+	df.to_csv(path + 'year_list.csv')
 
-	def filter_by_reso(x):
+	def filter_by_year(x):
 		try:
-			if float(x) <= limit_reso:
+			if int(x) <= limit_year:
 				return float(x)
 			else:
 				return None
 		except ValueError:
 			return None
 
-	selected_df = last_df['resolution'].apply(filter_by_reso).dropna()
+	selected_df = df['year'].apply(filter_by_year).dropna()
 
 	return selected_df
+
+date_list(2020)

@@ -13,10 +13,9 @@ import numpy as np
 # ----------------------------------------------------------
 # constants
 # ----------------------------------------------------------
-negatives = "/Users/tkimura/Desktop/RNP/zdock/vectors.csv"
-positive = "/Users/tkimura/Desktop/RNP/check_contact/non_redun_positives_atom.txt"
 svm_solution = "/Users/tkimura/Desktop/RNP/svm/svm_out.csv"
-svm_norm = "/Users/tkimura/Desktop/RNP/svm/svm_out_normed.csv"
+svm_norm = "/Users/tkimura/Desktop/t3_mnt/zdock/python/polar_range_mpi/data_from_laptop/svm_out_normed.csv"
+
 columnnames = ['chain', 'posi_count', 'native_exist', 'c_value', 'iter',
 		   'ALA_A', 'ALA_C', 'ALA_G', 'ALA_U', 'ARG_A', 'ARG_C',
 			'ARG_G', 'ARG_U', 'ASN_A', 'ASN_C', 'ASN_G', 'ASN_U', 'ASP_A', 'ASP_C',

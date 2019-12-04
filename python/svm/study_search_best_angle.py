@@ -19,7 +19,7 @@ def search_best_angles(reso_limit, contact_limit, remove_id_list, exp):
 	bpath2 = '/Users/tkimura/Desktop/t3_mnt/zdock/python/polar_range_mpi/data_from_laptop/outs/'
 	max0 = bpath2 + 'w_range_max_0.csv'
 	min0 = bpath2 + 'w_range_min_0.csv'
-	output = bpath + 'best_w.csv'
+	output = bpath + 'study_best_w.csv'
 	svm = bpath + 'svm_out_normed.csv'
 	positive = "/Users/tkimura/Desktop/RNP/check_contact/non_redun_positives.txt"
 
@@ -50,7 +50,7 @@ def search_best_angles(reso_limit, contact_limit, remove_id_list, exp):
 
 	# make the output file
 	with open(output, 'w') as fo:
-		fo.writelines('id, count, min_angle, max_angle, average, gap\n')
+		fo.writelines('i,min_count,count,count1,count2,count1,count2\n')
 
 	################################################
 	# filter max_df by resolution and all_chains
@@ -70,6 +70,8 @@ def search_best_angles(reso_limit, contact_limit, remove_id_list, exp):
 	print(len(selected_min_df))
 
 	for c in range(79):
+		if c != 19:
+			continue
 		max_list = selected_max_df[str(c)].values.tolist()
 		min_list = selected_min_df[str(c)].values.tolist()
 		# find a minimum gap
@@ -100,7 +102,7 @@ def search_best_angles(reso_limit, contact_limit, remove_id_list, exp):
 				for val in min_list: # count bigger min
 					if val > border:
 						count2 += 1
-				count = abs(count1 - count2)
+				count = (count1 + count2)/2
 				if count < min_count: # update the smallest angle
 					min_count = count
 					min_angle = border
@@ -120,12 +122,12 @@ def search_best_angles(reso_limit, contact_limit, remove_id_list, exp):
 				for val in min_list: # count bigger min
 					if val > border:
 						count2 += 1
-				count = abs(count1 - count2)
-				if count == min_count:  # update the lowest point
-					max_angle = border
-					break
-				else:
-					border -= step
+				count = (count1 + count2)/2
 
-			print(f'{c}, {min_count}, {min_angle}, {max_angle}')
-			fo.writelines(f'{c}, {min_count}, {min_angle}, {max_angle}, {(min_angle + max_angle)/2}, {max_angle - min_angle}\n')
+				# if count == min_count:  # update the lowest point
+				# 	max_angle = border
+				# 	border -= step
+				# 	# break
+				# else:
+				border -= step
+				fo.writelines(f'{i}, {border}, {min_count}, {count}, {count1}, {count2}, {abs(count1 - count2)}\n')

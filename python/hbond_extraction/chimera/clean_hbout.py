@@ -13,7 +13,8 @@ import os
 # ----------------------------------------------------------
 # constants
 # ----------------------------------------------------------
-xprm_list = ['xray', 'EM']
+# xprm_list = ['xray', 'EM']
+xprm_list = ['xray']
 path = '/Users/tkimura/Desktop/RNP/check_contact/'
 root_path_from = path + 'chimera_hb_out/'
 root_path_to = path + 'hb_out_cleaned/'
