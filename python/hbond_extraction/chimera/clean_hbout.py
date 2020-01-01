@@ -39,12 +39,13 @@ for xprm in xprm_list:
 		with open(root_path_to + xprm + '/' + file, 'w') as fo:
 			with open(root_path_from + xprm + '_cif/' + file) as f:
 				for line in f.readlines():
+					print(line)
 					if xprm == 'xray':
-						if line[0:2] == '#0' and 'HOH' not in line:
+						if '#0' in line and 'HOH' not in line:
 							fo.writelines(line)
-					else:
-						if 'HOH' not in line:
-							#0 7MG 1.D N1 #0 G 1.D N7
-							#0 7MG 1.D N2 #0 G 1.D N7
-							if line.split()[2] != line.split()[6]:
-								fo.writelines(line)
+					# else:
+					# 	if 'HOH' not in line:
+					# 		#0 7MG 1.D N1 #0 G 1.D N7
+					# 		#0 7MG 1.D N2 #0 G 1.D N7
+					# 		if line.split()[2] != line.split()[6]:
+					# 			fo.writelines(line)

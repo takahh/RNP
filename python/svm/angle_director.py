@@ -14,13 +14,13 @@ from python.svm.all_indi_compare_plot import indi_common_plot
 # ----------------------------------------------------------
 # constants
 # ----------------------------------------------------------
-reso_limit_list = [2.5, 3.0]
-contact_limit_list = [0.5, 1.0, 1.5, 2.0]
-# contact_limit_list = [0.5, 1, 1.5, 2.0]
+reso_limit_list = [2.8, 2.9]
+# contact_limit_list = [0.5]
+contact_limit_list = [0.5, 0.6, 0.7]
 # reso_limit_list = [3.5]
 # contact_limit_list = [0.5]
-remove_id_list = ['2bs0_C_S']
-# remove_id_list = []
+# remove_id_list = ['2bs0_C_S']
+remove_id_list = []
 exp = 'xray'
 
 # ----------------------------------------------------------

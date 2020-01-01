@@ -33,7 +33,7 @@ print(reso25_list)
 print(len(reso25_list))
 
 # make allchain list
-allchains_list = filter_by_contacts(0.5)
+allchains_list = filter_by_contacts(2)
 allchains_list_short = [x[0:4] for x in allchains_list]
 print(allchains_list_short)
 print(len(allchains_list_short))
@@ -46,7 +46,8 @@ for item in anisou_list:
 	if item in reso25_list:
 		if item in allchains_list_short:
 			rerun_list.append(item)
-print(rerun_list)
+print('rerun')
+print(len(rerun_list))
 #
 # with open(anisou_rerun_list, 'w') as fo:
 # 	for item in rerun_list:

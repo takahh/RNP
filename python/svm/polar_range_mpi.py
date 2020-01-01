@@ -189,13 +189,10 @@ def sweep_angles(outfile, mode, polar, initial_rank, limit_polar, chid, initial_
 
 
 # check if the id is already in the output
-def check_done(pair_id, outfile):
-	# try:
+def update_id_list(outfile, id_list):
 	df = pd.read_csv(outfile)
-	if pair_id in df['id'].values.tolist():
-		return 1
-	else:
-		return 0
+	new_id_list = [id for id in id_list if id not in df['id'].values.tolist()]
+	return new_id_list
 
 
 def find_limit(id_list, converge_thrhd, half_rate, rank):
@@ -204,9 +201,12 @@ def find_limit(id_list, converge_thrhd, half_rate, rank):
 	initialize_file(range_max)
 	initialize_file(range_min)
 
+	id_list = update_id_list(range_min, id_list)
+
 	for id in id_list:
-		if check_done(id, range_min) == 1:
-			continue
+		# if check_done(id, range_min) == 1:
+		# 	continue
+		vec = []
 		init_incre = [1/(np.pi)] * 79
 		try:
 			vec = df_svm[df_svm['chain'] == id].values.tolist()[0][5:85]  # svm'ed solution : Cartesian

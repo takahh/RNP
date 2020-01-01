@@ -80,6 +80,9 @@ for xprm in xprm_list:
 				touching_chain_dic['chain'] = file[0:4] + chain
 				with open(root_path_from + xprm + '/' + file) as f:
 					for line in f.readlines():
+						if '.pdb' in line or '.cif' in line:
+							continue
+						print(line)
 						element = line.split()
 						# find rows including '#0:' and the chain id
 						model1 = element[0]

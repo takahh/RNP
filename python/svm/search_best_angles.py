@@ -23,8 +23,8 @@ def search_best_angles(reso_limit, contact_limit, remove_id_list, exp):
 	svm = bpath + 'svm_out_normed.csv'
 	positive = "/Users/tkimura/Desktop/RNP/check_contact/non_redun_positives.txt"
 
-	df_svm = pd.read_csv(svm)
-	all_list = df_svm['chain'].values.tolist()
+	# df_svm = pd.read_csv(svm)
+	# all_list = df_svm['chain'].values.tolist()
 	id_list_by_contacts_filter = filter_by_contacts(contact_limit)
 	if exp != []:
 		df_posi = pd.read_csv(positive)

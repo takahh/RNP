@@ -21,10 +21,23 @@ from resolutions.resolution_list import resolution_list
 # ----------------------------------------------------------
 # constants
 # ----------------------------------------------------------
-fig_path = "/Users/tkimura/Desktop/RNP/svm/svm_test.png"
-out_file = "/Users/tkimura/Desktop/RNP/svm/svm_out.csv"
+base_path = '/Users/tkimura/Desktop/RNP/'
+remo_path = '/Users/tkimura/Desktop/t3_mnt/zdock/'
+fig_path = base_path + "svm/svm_test.png"
+out_file = base_path + "svm/svm_out.csv"
+full_columns = ['vec_id', 'exp', 'ALA_A', 'ALA_C', 'ALA_G', 'ALA_U', 'ARG_A', 'ARG_C',
+       'ARG_G', 'ARG_U', 'ASN_A', 'ASN_C', 'ASN_G', 'ASN_U', 'ASP_A', 'ASP_C',
+       'ASP_G', 'ASP_U', 'CYS_A', 'CYS_C', 'CYS_G', 'CYS_U', 'GLU_A', 'GLU_C',
+       'GLU_G', 'GLU_U', 'GLN_A', 'GLN_C', 'GLN_G', 'GLN_U', 'GLY_A', 'GLY_C',
+       'GLY_G', 'GLY_U', 'HIS_A', 'HIS_C', 'HIS_G', 'HIS_U', 'ILE_A', 'ILE_C',
+       'ILE_G', 'ILE_U', 'LEU_A', 'LEU_C', 'LEU_G', 'LEU_U', 'LYS_A', 'LYS_C',
+       'LYS_G', 'LYS_U', 'MET_A', 'MET_C', 'MET_G', 'MET_U', 'PHE_A', 'PHE_C',
+       'PHE_G', 'PHE_U', 'PRO_A', 'PRO_C', 'PRO_G', 'PRO_U', 'SER_A', 'SER_C',
+       'SER_G', 'SER_U', 'THR_A', 'THR_C', 'THR_G', 'THR_U', 'TRP_A', 'TRP_C',
+       'TRP_G', 'TRP_U', 'TYR_A', 'TYR_C', 'TYR_G', 'TYR_U', 'VAL_A', 'VAL_C',
+       'VAL_G', 'VAL_U', 'all_chains']
 column_list = ['ALA_A', 'ALA_C', 'ALA_G', 'ALA_U', 'ARG_A', 'ARG_C', 'ARG_G', 'ARG_U','ASN_A','ASN_C','ASN_G','ASN_U','ASP_A','ASP_C','ASP_G','ASP_U','CYS_A','CYS_C','CYS_G','CYS_U','GLU_A','GLU_C','GLU_G','GLU_U','GLN_A','GLN_C','GLN_G','GLN_U','GLY_A','GLY_C', 'GLY_G', 'GLY_U', 'HIS_A', 'HIS_C', 'HIS_G', 'HIS_U', 'ILE_A', 'ILE_C', 'ILE_G', 'ILE_U', 'LEU_A', 'LEU_C', 'LEU_G', 'LEU_U', 'LYS_A', 'LYS_C', 'LYS_G', 'LYS_U', 'MET_A', 'MET_C', 'MET_G', 'MET_U', 'PHE_A', 'PHE_C', 'PHE_G', 'PHE_U', 'PRO_A', 'PRO_C', 'PRO_G', 'PRO_U', 'SER_A', 'SER_C', 'SER_G', 'SER_U', 'THR_A', 'THR_C', 'THR_G', 'THR_U', 'TRP_A', 'TRP_C', 'TRP_G', 'TRP_U', 'TYR_A', 'TYR_C', 'TYR_G', 'TYR_U', 'VAL_A', 'VAL_C', 'VAL_G', 'VAL_U', ]
-natives = '/Users/tkimura/Desktop/RNP/check_contact/non_redun_positives.txt'
+natives = base_path + "/check_contact/non_redun_positives.txt"
 
 # ----------------------------------------------------------
 # preprocess
@@ -32,7 +45,7 @@ natives = '/Users/tkimura/Desktop/RNP/check_contact/non_redun_positives.txt'
 # ----------------------------------------------------------
 df_posi = pd.read_csv(natives)
 posi_pdbid_list = df_posi["vec_id"].unique()
-nega_list = [x.replace('.csv', '') for x in os.listdir('/Users/tkimura/Desktop/RNP/zdock/vectors/')]
+nega_list = [x.replace('.csv', '') for x in os.listdir(remo_path + 'vectors/')]
 reso_list = resolution_list(2.5).index.tolist()
 
 with open(out_file, 'w') as fo:
@@ -42,11 +55,18 @@ with open(out_file, 'w') as fo:
 	# df_posi, df_nega : vectors in df
 	# ----------------------------------------------------------
 	for id in nega_list:
-		non_natives = '/Users/tkimura/Desktop/RNP/zdock/vectors/' + str(id) + '.csv'
+		if id[0] == '.':
+			continue
+		if id in ['2wwa_I_F']:
+			continue
+		non_natives = remo_path + 'vectors/' + str(id) + '.csv'
 		print('processing ' + str(id))
 		df_nega = pd.read_csv(non_natives) # includes pose number '1abc_100_A_B'
-		print(len(df_nega))
-		df_nega["vec_id_cld"] = df_nega.apply(lambda row: row.vec_id.split('_')[0] + '_' + row.vec_id.split('_')[1] + '_' + row.vec_id.split('_')[2], axis=1)
+		try:
+			df_nega["vec_id_cld"] = df_nega.apply(lambda row: row.vec_id.split('_')[0] + '_' + row.vec_id.split('_')[1] + '_' + row.vec_id.split('_')[2], axis=1)
+		except AttributeError:
+			df_nega.columns = df_posi.columns
+			df_nega["vec_id_cld"] = df_nega.apply(lambda row: row.vec_id.split('_')[0] + '_' + row.vec_id.split('_')[1] + '_' + row.vec_id.split('_')[2], axis=1)
 		nega_pdbid_list = df_nega['vec_id_cld'].unique()
 		chain = id
 		posi_1_df = df_posi[df_posi['vec_id'] == id][column_list]

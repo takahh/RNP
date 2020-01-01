@@ -12,7 +12,7 @@ def filter_by_contacts(contacts_ratio):
 	# ----------------------------------------------------------
 	# constants
 	# ----------------------------------------------------------
-	file = '/Users/tkimura/Desktop/RNP/check_contact/non_redun_positives.txt'
+	file = '/Users/tkimura/Desktop/t3_mnt/zdock/python/polar_range_mpi/data_from_laptop/non_redun_positivestxt'
 
 	# ----------------------------------------------------------
 	# functions

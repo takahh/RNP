@@ -2,12 +2,12 @@
 # this code is for extracting nonredundant positive dataset
 # with simplest classification : amino acid - base
 # ----------------------------------------------------------
-def non_redundant_negatives(ipath, opath):
+def non_redundant_negatives(ipath, opath, rank, idlist):
 
 	# ----------------------------------------------------------
 	# import
 	# ----------------------------------------------------------
-
+	import os.path
 	# ----------------------------------------------------------
 	# constants
 	# ----------------------------------------------------------
@@ -32,7 +32,7 @@ def non_redundant_negatives(ipath, opath):
 
 
 	native_dic = {}
-	with open('/Users/tkimura/Desktop/RNP/check_contact/non_redun_positives.txt') as f:
+	with open('/Users/tkimura/Desktop/t3_mnt/zdock/non_redun_positives.txt') as f:
 		for lines in f.readlines():
 			if 'vec_id' in lines:
 				continue
@@ -91,24 +91,33 @@ def non_redundant_negatives(ipath, opath):
 
 
 	# write each vector/list to a file at the last step
-	def write_dic_to_file(file, unique_dictionary):
+	def write_dic_to_file(path, unique_dictionary):
+		# file '/gs/hs0/tga-science/kimura/zdock/vectors.csv'
+		#   -> '/gs/hs0/tga-science/kimura/zdock/vectors/id.csv'
 		for key in unique_dictionary.keys():
 			vecid = key
 			exp = unique_dictionary[vecid][0]
 			count_vector = unique_dictionary[vecid][1]
+			id_ele = vecid.split("_")
+			pdbid = id_ele[0] + '_' + id_ele[1] + '_' + id_ele[2]
 			if judge_native_vector(vecid, count_vector):
 				print(vecid)
 				continue
 			# fetch 'allchains' by vec_id
-			with open(file, 'a') as fo:
-				fo.writelines(f'{vecid},{exp},')
-				i = 0
-				for item in count_vector:
-					if i == 79:
-						fo.writelines(f'{item},-10\n')
-					else:
-						fo.writelines(f'{item},')
-					i += 1
+			file = path.replace('.csv', '/' + pdbid + '.csv')
+			if not os.path.isdir(file):
+				with open(file, 'w'):
+					pass
+			else:
+				with open(file, 'a') as fo:
+					fo.writelines(f'{vecid},{exp},')
+					i = 0
+					for item in count_vector:
+						if i == 79:
+							fo.writelines(f'{item},-10\n')
+						else:
+							fo.writelines(f'{item},')
+						i += 1
 
 	# ----------------------------------------------------------
 	# main
@@ -124,8 +133,13 @@ def non_redundant_negatives(ipath, opath):
 			# 0		1		2		3		4		5		6	7	8	9	10			11
 			# pdbid	exp		presi	pchain	rresi	rchain	pp	pr	rp	rr	allchains	allchains3
 			# 2von	dck		ARG		392A	A		C
+
+			# 0				1		2		3		4		5
+			# pdbid			exp		presi	pchain	rresi	rchain	pp	pr	rp	rr	allchains	allchains3
+			# 292,5on3_A_B	dck		GLU		922_A	U		B
+
 			element = lines.split('\t')
-			pdbid = element[0]
+			pdbid = element[0].split(',')[1]
 			pchain = element[3]
 			rchain = element[5][:-1]
 			presi = element[2]

@@ -47,6 +47,7 @@ def indi_common_plot(reso_limit, contact_limit):
 	print(df_svm.columns)
 	plt.ylabel('rank')
 	plt.xlabel('pair')
+	plt.title(f'resolution: {reso_limit}, contact: {contact_limit}')
 	plt.gca().legend(('individual', 'common', 'itscorepr'))
 	plt.text(0, -140, 'average: ' + str(round(df_svm[' rank'].mean(), 3)))
 	plt.text(0, 140, 'average: ' + str(round(df_svm[' its_rank'].mean(), 3)))

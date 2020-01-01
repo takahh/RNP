@@ -21,7 +21,7 @@
 #  'all_chain'			総鎖数
 # ----------------------------------------------------------
 def hbond_summary_to_classify(ipath, opath):
-
+	# ipath = 'zdock/cleaned_hbonds/'
 	def hb_to_summary(from_path, summary_file):
 		# ----------------------------------------------------------
 		# import
